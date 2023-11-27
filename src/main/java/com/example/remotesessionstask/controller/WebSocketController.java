@@ -8,14 +8,13 @@ import com.example.remotesessionstask.response.RoleResponse;
 import com.example.remotesessionstask.service.RemoteSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+
+import java.util.Objects;
 
 @Log4j2
 @Controller
@@ -33,7 +32,7 @@ public class WebSocketController {
         RoleResponse roleResponse = new RoleResponse(role);
 
         String destination = "/topic/roles/" + codeBlockId;
-        headerAccessor.getSessionAttributes().put("codeBlockId", codeBlockId);
+        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("codeBlockId", codeBlockId);
         headerAccessor.setDestination(destination);
         this.template.convertAndSend(destination, roleResponse);
     }
@@ -45,7 +44,7 @@ public class WebSocketController {
         CodeChangeResponse codeChangeResponse = new CodeChangeResponse(request.code());
 
         String destination = "/topic/code/" + codeBlockId;
-        headerAccessor.getSessionAttributes().put("codeBlockId", codeBlockId);
+        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("codeBlockId", codeBlockId);
         headerAccessor.setDestination(destination);
         this.template.convertAndSend(destination, codeChangeResponse);
     }
@@ -62,7 +61,7 @@ public class WebSocketController {
         ExitCodeBlockResponse exitCodeBlockResponse = new ExitCodeBlockResponse(isRemoteSessionTerminated);
 
         String destination = "/topic/remoteSessionStatus/" + codeBlockId;
-        headerAccessor.getSessionAttributes().put("codeBlockId", codeBlockId);
+        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("codeBlockId", codeBlockId);
         headerAccessor.setDestination(destination);
 
         this.template.convertAndSend(destination, exitCodeBlockResponse);
