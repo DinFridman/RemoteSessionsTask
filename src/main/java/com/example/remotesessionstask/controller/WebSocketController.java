@@ -2,9 +2,8 @@ package com.example.remotesessionstask.controller;
 
 import com.example.remotesessionstask.request.CodeUpdateRequest;
 import com.example.remotesessionstask.request.ExitCodeBlockRequest;
-import com.example.remotesessionstask.response.CodeChangeResponse;
-import com.example.remotesessionstask.response.ExitCodeBlockResponse;
-import com.example.remotesessionstask.response.RoleResponse;
+import com.example.remotesessionstask.response.CodeUpdateResponse;
+import com.example.remotesessionstask.response.DisconnectCodeBlockResponse;
 import com.example.remotesessionstask.service.RemoteSessionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,8 +12,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
 import java.util.Objects;
+import static com.example.remotesessionstask.utils.Constants.CODE_UPDATE_TYPE;
+import static com.example.remotesessionstask.utils.Constants.REMOTE_SESSION_TERMINATION_TYPE;
 
 @Log4j2
 @Controller
@@ -24,48 +24,37 @@ public class WebSocketController {
     private final SimpMessagingTemplate template;
 
 
-    @MessageMapping("/getRole/{codeBlockId}")
-    public void getRole(@DestinationVariable int codeBlockId, SimpMessageHeaderAccessor headerAccessor) {
-
-        String role = remoteSessionService.getRole(codeBlockId);
-
-        RoleResponse roleResponse = new RoleResponse(role);
-
-        String destination = "/topic/roles/" + codeBlockId;
-        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("codeBlockId", codeBlockId);
-        headerAccessor.setDestination(destination);
-        this.template.convertAndSend(destination, roleResponse);
-    }
-
-    @MessageMapping("/codeChange/{codeBlockId}")
+    @MessageMapping("/codeUpdate/{codeBlockId}")
     public void codeChange(@DestinationVariable int codeBlockId,
                            CodeUpdateRequest request, SimpMessageHeaderAccessor headerAccessor) {
 
-        CodeChangeResponse codeChangeResponse = new CodeChangeResponse(request.code());
+        log.info("codeUpdate incoming!, {}", request);
 
-        String destination = "/topic/code/" + codeBlockId;
+        CodeUpdateResponse codeUpdateResponse = new CodeUpdateResponse(request.code(), CODE_UPDATE_TYPE);
+
+        String destination = "/topic/remoteSessionDetails/" + codeBlockId;
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("codeBlockId", codeBlockId);
         headerAccessor.setDestination(destination);
-        this.template.convertAndSend(destination, codeChangeResponse);
+        this.template.convertAndSend(destination, codeUpdateResponse);
     }
 
-    @MessageMapping("/exitCodeBlock/{codeBlockId}")
+    @MessageMapping("/disconnectCodeBlock/{codeBlockId}")
     public void exitCodeBlock(@DestinationVariable int codeBlockId,
                               ExitCodeBlockRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        log.info("Exit codeBlock Id {} request is incoming! Details : {}", codeBlockId, request);
+        log.debug("Disconnect codeBlock Id {} request is incoming! Details : {}", codeBlockId, request);
 
         boolean isRemoteSessionTerminated =
                 remoteSessionService.handleCodeBlockExit(codeBlockId, request.role());
 
 
-        ExitCodeBlockResponse exitCodeBlockResponse = new ExitCodeBlockResponse(isRemoteSessionTerminated);
+        DisconnectCodeBlockResponse disconnectCodeBlockResponse =
+                new DisconnectCodeBlockResponse(isRemoteSessionTerminated, REMOTE_SESSION_TERMINATION_TYPE);
 
-        String destination = "/topic/remoteSessionStatus/" + codeBlockId;
+        String destination = "/topic/remoteSessionDetails/" + codeBlockId;
         Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("codeBlockId", codeBlockId);
         headerAccessor.setDestination(destination);
 
-        this.template.convertAndSend(destination, exitCodeBlockResponse);
+        this.template.convertAndSend(destination, disconnectCodeBlockResponse);
     }
-
 
 }

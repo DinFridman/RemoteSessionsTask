@@ -1,13 +1,34 @@
 package com.example.remotesessionstask.service;
 
+import com.example.remotesessionstask.dto.CodeBlockDTO;
+import com.example.remotesessionstask.response.InitRemoteSessionData;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import static com.example.remotesessionstask.utils.Constants.*;
 
 @Service
+@RequiredArgsConstructor
 @Log4j2
 public class RemoteSessionService {
     private final boolean[] mentorAssignments = new boolean[NUM_OF_CODE_BLOCKS];
+    private final CodeBlockService codeBlockService;
+
+    public synchronized InitRemoteSessionData getInitRemoteSessionData(int codeBlockId) {
+        String role = getRole(codeBlockId);
+        CodeBlockDTO codeBlockDTO = codeBlockService.getCodeBlock(codeBlockId);
+
+        return createInitRemoteSessionData(role,codeBlockDTO);
+    }
+
+    private InitRemoteSessionData createInitRemoteSessionData(String role, CodeBlockDTO codeBlockDTO) {
+        return new InitRemoteSessionData(
+                role,
+                codeBlockDTO.code(),
+                codeBlockDTO.solution(),
+                INIT_DATA_TYPE);
+
+    }
 
     public synchronized String getRole(int codeBlockId) {
         if(isMentorAssigned(codeBlockId))
