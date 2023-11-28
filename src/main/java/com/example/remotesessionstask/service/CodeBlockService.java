@@ -23,7 +23,9 @@ public class CodeBlockService {
                 new CodeBlock(2, "Functional Programming", "function functionalProgramming() {}", "function functionalProgramming() {functionalProgramming solution}"),
                 new CodeBlock(3, "Object Oriented Programming", "function objectOrientedProgramming() {}", "function objectOrientedProgramming() {OOP solution}")
         );
-        codeBlockRepository.saveAll(codeBlocks);
+        if(codeBlockRepository.saveAll(codeBlocks).isEmpty())
+            log.error("Error while saving codeblocks!");
+
         log.info("CodeBlocks initialized successfully.");
     }
 
