@@ -13,49 +13,54 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 @Log4j2
 @Component
-public class StompSubscribeEventListener implements ApplicationListener<SessionSubscribeEvent> {
+public class StompEventListeners implements ApplicationListener<SessionSubscribeEvent> {
+
     private final SimpMessageSendingOperations messagingTemplate;
     private final RemoteSessionService remoteSessionService;
 
-    public StompSubscribeEventListener(SimpMessageSendingOperations messagingTemplate, RemoteSessionService remoteSessionService) {
+    public StompEventListeners(SimpMessageSendingOperations messagingTemplate, RemoteSessionService remoteSessionService) {
         this.messagingTemplate = messagingTemplate;
         this.remoteSessionService = remoteSessionService;
     }
 
     @Override
-    public void onApplicationEvent(SessionSubscribeEvent event) {
+    public void onApplicationEvent(SessionSubscribeEvent  event) {
         Message<byte[]> message = event.getMessage();
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompCommand command = accessor.getCommand();
 
         assert command != null;
         if (command.equals(StompCommand.SUBSCRIBE)) {
+            String sessionId = accessor.getSessionId();
             String destination = accessor.getDestination();
 
+            log.debug("subscription destination: " + destination);
+
             if (destination != null && destination.startsWith("/topic/remoteSessionDetails/")) {
-                // Extracting the codeBlockId from the URL
-                String[] parts = destination.split("/");
-                if (parts.length > 3) {
-                    String codeBlockIdStr = parts[3];
-                    try {
-                        int codeBlockId = Integer.parseInt(codeBlockIdStr);
+                int codeBlockId = extractCodeBlockId(destination);
 
-                        InitRemoteSessionData initRemoteSessionData = fetchInitRemoteSessionData(codeBlockId);
+                log.debug("subscription id : " + sessionId);
 
-                        this.messagingTemplate.convertAndSend(destination, initRemoteSessionData);
-
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid codeBlockId: " + codeBlockIdStr);
-                    }
+                if (codeBlockId != -1) {
+                    InitRemoteSessionData initRemoteSessionData = fetchInitRemoteSessionData(codeBlockId, sessionId);
+                    this.messagingTemplate.convertAndSend(destination, initRemoteSessionData);
                 }
             }
+
         }
     }
 
-    private InitRemoteSessionData fetchInitRemoteSessionData(int codeBlockId) {
-        InitRemoteSessionData initRemoteSessionData = remoteSessionService.getInitRemoteSessionData(codeBlockId);
-        log.debug("InitRemoteSessionData details : {}", initRemoteSessionData);
+    private InitRemoteSessionData fetchInitRemoteSessionData(int codeBlockId, String sessionId) {
+        return remoteSessionService.getInitRemoteSessionData(codeBlockId, sessionId);
+    }
 
-        return initRemoteSessionData;
+    private int extractCodeBlockId(String destination) {
+        try {
+            String[] parts = destination.split("/");
+            return Integer.parseInt(parts[parts.length - 1]);
+        } catch (NumberFormatException e) {
+            log.error("Invalid codeBlockId in destination URL: {}", destination, e);
+            return -1;
+        }
     }
 }

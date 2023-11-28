@@ -28,8 +28,6 @@ public class WebSocketController {
     public void codeChange(@DestinationVariable int codeBlockId,
                            CodeUpdateRequest request, SimpMessageHeaderAccessor headerAccessor) {
 
-        log.info("codeUpdate incoming!, {}", request);
-
         CodeUpdateResponse codeUpdateResponse = new CodeUpdateResponse(request.code(), CODE_UPDATE_TYPE);
 
         String destination = "/topic/remoteSessionDetails/" + codeBlockId;
@@ -43,8 +41,10 @@ public class WebSocketController {
                               ExitCodeBlockRequest request, SimpMessageHeaderAccessor headerAccessor) {
         log.debug("Disconnect codeBlock Id {} request is incoming! Details : {}", codeBlockId, request);
 
+        String sessionId = headerAccessor.getSessionId();
+
         boolean isRemoteSessionTerminated =
-                remoteSessionService.handleCodeBlockExit(codeBlockId, request.role());
+                remoteSessionService.handleCodeBlockExit(codeBlockId, sessionId);
 
 
         DisconnectCodeBlockResponse disconnectCodeBlockResponse =
@@ -58,3 +58,4 @@ public class WebSocketController {
     }
 
 }
+
