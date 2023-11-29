@@ -1,0 +1,49 @@
+version: '3.8'
+
+networks:
+  RemoteSessionsTask-network:
+    driver: bridge
+
+services:
+  mysql-container:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: remote_session_db
+      MYSQL_ROOT_PASSWORD: remoteSession
+    ports:
+      - "3306:3306"
+    networks:
+      - RemoteSessionsTask-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "mysql-container" ]
+      timeout: 30s
+      retries: 10
+
+  remote-sessions-app:
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - RemoteSessionsTask-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-container:3306/remote_session_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: remoteSession
+    depends_on:
+      mysql-container:
+        condition: service_healthy
+    restart: always
+
+  react-frontend-app:
+    build: ../remote-sessions-task
+    ports:
+      - "3000:80"
+    networks:
+      - RemoteSessionsTask-network
+    restart: always
+
+volumes:
+  mysql-data:
