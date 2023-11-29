@@ -17,12 +17,10 @@ class RemoteSessionServiceTest {
     @Mock private CodeBlockService codeBlockService;
     @InjectMocks private RemoteSessionService underTest;
     @Mock private MentorAssignmentsManager mentorAssignmentsManager;
-    private String sessionId;
     private CodeBlockDTO codeBlockDTO;
     private InitRemoteSessionData expectedResponse;
     @BeforeEach
     void setUp() {
-        sessionId = String.valueOf(1);
         codeBlockDTO = new CodeBlockDTO(0, "Async Case", "function asyncCase() {}", "function asyncCase() {async solution}");
 
     }
@@ -32,7 +30,7 @@ class RemoteSessionServiceTest {
         int invalidCodeBlockId = NUM_OF_CODE_BLOCKS + 1;
 
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> underTest.getInitRemoteSessionData(invalidCodeBlockId, sessionId));
+                () -> underTest.getInitRemoteSessionData(invalidCodeBlockId));
     }
 
     @Test
@@ -45,7 +43,7 @@ class RemoteSessionServiceTest {
         Mockito.when(codeBlockService.getCodeBlock(codeBlockId)).thenReturn(codeBlockDTO);
 
         InitRemoteSessionData actualResponse =
-                underTest.getInitRemoteSessionData(codeBlockId,sessionId);
+                underTest.getInitRemoteSessionData(codeBlockId);
 
         Assertions.assertEquals(expectedResponse,actualResponse);
     }
@@ -60,18 +58,18 @@ class RemoteSessionServiceTest {
         Mockito.when(codeBlockService.getCodeBlock(codeBlockId)).thenReturn(codeBlockDTO);
 
         InitRemoteSessionData actualResponse =
-                underTest.getInitRemoteSessionData(codeBlockId,sessionId);
+                underTest.getInitRemoteSessionData(codeBlockId);
 
         Assertions.assertEquals(expectedResponse,actualResponse);
-        Mockito.verify(mentorAssignmentsManager).assignMentor(codeBlockId,sessionId);
+        Mockito.verify(mentorAssignmentsManager).assignMentor(codeBlockId);
     }
 
     @Test
     void shouldReturnRemoteSessionTerminationSignalTrueWhenCallingHandleCodeBlockExit() {
         int codeBlockId = codeBlockDTO.codeBlockId();
-        Mockito.when(mentorAssignmentsManager.checkIfMentorIsAssignedBySessionId(codeBlockId,sessionId)).thenReturn(true);
+        Mockito.when(mentorAssignmentsManager.isMentorAssigned(codeBlockId)).thenReturn(true);
 
-        boolean actualResponse = underTest.handleCodeBlockExit(codeBlockId,sessionId);
+        boolean actualResponse = underTest.handleCodeBlockExit(codeBlockId);
 
         Assertions.assertEquals(REMOTE_SESSION_TERMINATION_SIGNAL, actualResponse);
         Mockito.verify(mentorAssignmentsManager).resetMentorAssignment(codeBlockId);
@@ -80,9 +78,9 @@ class RemoteSessionServiceTest {
     @Test
     void shouldReturnRemoteSessionTerminationSignalFalseWhenCallingHandleCodeBlockExit() {
         int codeBlockId = codeBlockDTO.codeBlockId();
-        Mockito.when(mentorAssignmentsManager.checkIfMentorIsAssignedBySessionId(codeBlockId,sessionId)).thenReturn(false);
+        Mockito.when(mentorAssignmentsManager.isMentorAssigned(codeBlockId)).thenReturn(false);
 
-        boolean actualResponse = underTest.handleCodeBlockExit(codeBlockId,sessionId);
+        boolean actualResponse = underTest.handleCodeBlockExit(codeBlockId);
 
         Assertions.assertEquals(!REMOTE_SESSION_TERMINATION_SIGNAL, actualResponse);
     }

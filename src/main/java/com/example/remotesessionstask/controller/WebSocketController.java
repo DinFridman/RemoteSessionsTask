@@ -41,10 +41,8 @@ public class WebSocketController {
                               ExitCodeBlockRequest request, SimpMessageHeaderAccessor headerAccessor) {
         log.debug("Disconnect codeBlock Id {} request is incoming! Details : {}", codeBlockId, request);
 
-        String sessionId = headerAccessor.getSessionId();
-
         boolean isRemoteSessionTerminated =
-                remoteSessionService.handleCodeBlockExit(codeBlockId, sessionId);
+                remoteSessionService.handleCodeBlockExit(codeBlockId);
 
 
         DisconnectCodeBlockResponse disconnectCodeBlockResponse =

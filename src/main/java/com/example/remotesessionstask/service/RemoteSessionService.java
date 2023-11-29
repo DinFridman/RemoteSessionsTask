@@ -16,18 +16,18 @@ public class RemoteSessionService {
     private final MentorAssignmentsManager mentorAssignmentsManager;
     private final CodeBlockService codeBlockService;
 
-    public synchronized InitRemoteSessionData getInitRemoteSessionData(int codeBlockId, String sessionId) {
+    public synchronized InitRemoteSessionData getInitRemoteSessionData(int codeBlockId) {
         validateCodeBlockId(codeBlockId);
 
         String role = getRole(codeBlockId);
-        mentorAssignmentsManager.assignMentor(codeBlockId,sessionId);
+        mentorAssignmentsManager.assignMentor(codeBlockId);
         CodeBlockDTO codeBlockDTO = codeBlockService.getCodeBlock(codeBlockId);
 
         return createInitRemoteSessionData(role,codeBlockDTO);
     }
 
-    public synchronized boolean handleCodeBlockExit(int codeBlockId, String sessionId) {
-        if(mentorAssignmentsManager.checkIfMentorIsAssignedBySessionId(codeBlockId,sessionId)) {
+    public synchronized boolean handleCodeBlockExit(int codeBlockId) {
+        if(mentorAssignmentsManager.isMentorAssigned(codeBlockId)) {
             mentorAssignmentsManager.resetMentorAssignment(codeBlockId);
             return REMOTE_SESSION_TERMINATION_SIGNAL;
         }

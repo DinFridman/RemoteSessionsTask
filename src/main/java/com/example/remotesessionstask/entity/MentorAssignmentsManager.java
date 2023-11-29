@@ -5,25 +5,21 @@ import lombok.Data;
 
 @Data
 public class MentorAssignmentsManager {
-    private final String[] mentorAssignments;
+    private final boolean[] mentorAssignments;
 
     public MentorAssignmentsManager(int numOfCodeBlocks) {
-        this.mentorAssignments = new String[numOfCodeBlocks];
+        this.mentorAssignments = new boolean[numOfCodeBlocks];
     }
 
     public void resetMentorAssignment(int codeBlockId) {
-        this.mentorAssignments[codeBlockId] = null;
+        this.mentorAssignments[codeBlockId] = false;
     }
 
     public boolean isMentorAssigned(int codeBlockId) {
-        return mentorAssignments[codeBlockId] != null;
+        return mentorAssignments[codeBlockId];
     }
 
-    public void assignMentor(int codeBlockId, String sessionId) {
-        mentorAssignments[codeBlockId] = sessionId;
-    }
-
-    public boolean checkIfMentorIsAssignedBySessionId(int codeBlockId, String sessionId) {
-        return mentorAssignments[codeBlockId].equals(sessionId);
+    public void assignMentor(int codeBlockId) {
+        mentorAssignments[codeBlockId] = true;
     }
 }

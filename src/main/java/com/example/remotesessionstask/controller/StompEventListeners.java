@@ -31,7 +31,6 @@ public class StompEventListeners implements ApplicationListener<SessionSubscribe
 
         assert command != null;
         if (command.equals(StompCommand.SUBSCRIBE)) {
-            String sessionId = accessor.getSessionId();
             String destination = accessor.getDestination();
 
             log.debug("subscription destination: " + destination);
@@ -39,10 +38,8 @@ public class StompEventListeners implements ApplicationListener<SessionSubscribe
             if (destination != null && destination.startsWith("/topic/remoteSessionDetails/")) {
                 int codeBlockId = extractCodeBlockId(destination);
 
-                log.debug("subscription id : " + sessionId);
-
                 if (codeBlockId != -1) {
-                    InitRemoteSessionData initRemoteSessionData = fetchInitRemoteSessionData(codeBlockId, sessionId);
+                    InitRemoteSessionData initRemoteSessionData = fetchInitRemoteSessionData(codeBlockId);
                     this.messagingTemplate.convertAndSend(destination, initRemoteSessionData);
                 }
             }
@@ -50,8 +47,8 @@ public class StompEventListeners implements ApplicationListener<SessionSubscribe
         }
     }
 
-    private InitRemoteSessionData fetchInitRemoteSessionData(int codeBlockId, String sessionId) {
-        return remoteSessionService.getInitRemoteSessionData(codeBlockId, sessionId);
+    private InitRemoteSessionData fetchInitRemoteSessionData(int codeBlockId) {
+        return remoteSessionService.getInitRemoteSessionData(codeBlockId);
     }
 
     private int extractCodeBlockId(String destination) {
