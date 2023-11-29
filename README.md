@@ -1,14 +1,18 @@
 # Online Coding Web Application
-This project is an online coding web application designed for remote JavaScript mentorship sessions. It facilitates real-time collaboration between mentors and students, allowing mentors to share code blocks and students to edit them in real time.
+This project is an online coding web application designed for remote sessions in real time.
+
+## Project URL
+https://remote-sessions-task.netlify.app/
 
 ## Tech Stack
-Frontend: React
-Backend: Java Spring
-Database: MySQL
+- **Frontend**: React
+- **Backend**: Java Spring
+- **Database**: MySQL
 
-## Solutions for the bonus:
 
-Async Case: "function asyncCase() {async solution}"
-JS Fundamentals: "function JSFundamentals() {JSFundamentals solution}"
-Functional Programming: "function functionalProgramming() {functionalProgramming solution}"
-Object Oriented Programming: "function objectOrientedProgramming() {OOP solution}"
+## Solutions for the bonus
+
+- Async Case: "function asyncCase() {async solution}" \n
+- JS Fundamentals: "function JSFundamentals() {JSFundamentals solution}" \n
+- Functional Programming: "function functionalProgramming() {functionalProgramming solution}" \n
+- Object Oriented Programming: "function objectOrientedProgramming() {OOP solution}"
