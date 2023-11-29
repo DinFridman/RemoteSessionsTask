@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/codeblocks-websocket").setAllowedOrigins(CLIENT_URL);
+        registry.addEndpoint("/codeblocks-websocket").setAllowedOrigins("*");
 
     }
 
