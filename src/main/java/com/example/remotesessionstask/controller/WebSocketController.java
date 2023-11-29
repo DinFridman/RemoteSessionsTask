@@ -57,12 +57,5 @@ public class WebSocketController {
 
         this.template.convertAndSend(destination, disconnectCodeBlockResponse);
     }
-
-
-    @GetMapping("/")
-    public String index() {
-        return "test";
-    }
-
 }
 
