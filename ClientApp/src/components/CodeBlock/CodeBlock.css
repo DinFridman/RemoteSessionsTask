@@ -1,0 +1,67 @@
+body {
+    background-color: #f7f7f7; /* Or any other color you prefer */
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+ 
+.codeblock-container {
+    background-color: #f7f7f7;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 800px; 
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+.codeblock-editor {
+    width: 100%; 
+    height: 500px; 
+}
+
+.codeblock-header {
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+.codeblock-role {
+    margin-bottom: 20px;
+}
+
+.codeblock-editor {
+    width: 100%; /* Full width */
+    max-width: 800px; /* Maximum width */
+    height: auto; /* Height adjusts to content */
+    aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+    margin: auto; /* Center the editor */
+    overflow: auto; /* Add scroll if content overflows */
+}
+
+.codeblock-mentor-container {
+    width: 100%; /* Full width */
+    max-width: 800px; /* Maximum width */
+    height: auto; /* Height adjusts to content */
+    aspect-ratio: 16 / 9; /* Maintain aspect ratio */
+    margin: auto; /* Center the editor */
+    overflow: auto; /* Add scroll if content overflows */
+}
+
+@media (max-width: 600px) {
+    .editor {
+        height: 300px; 
+    }
+}
+
+
+.smiley-face {
+    font-size: '500px';
+    color: 'green';
+    text-align: 'center';
+}
