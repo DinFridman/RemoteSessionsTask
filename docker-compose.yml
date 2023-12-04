@@ -1,0 +1,36 @@
+version: '3.9'
+
+networks:
+  RemoteSessionsTask-network:
+    driver: bridge
+
+services:
+  mysql-db:
+    image: mysql:latest
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: remoteSession
+    ports:
+      - "3306:3306"
+    networks:
+      - RemoteSessionsTask-network
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "mysql-container" ]
+      timeout: 30s
+      retries: 10
+
+  remoteSessionsTask:
+    build: .
+    image: remote-sessions-task-app
+    environment:
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: remoteSession
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/remote_session_db
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - RemoteSessionsTask-network
